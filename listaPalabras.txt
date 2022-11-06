@@ -1,0 +1,6 @@
+teclado
+monitor
+raton
+cable
+david
+samuel
