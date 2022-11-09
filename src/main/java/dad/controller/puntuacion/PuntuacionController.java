@@ -1,9 +1,13 @@
 package dad.controller.puntuacion;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ListProperty;
@@ -61,17 +65,16 @@ public class PuntuacionController implements Initializable {
 
 		// load data
 		try {
-			BufferedReader fr = new BufferedReader(new FileReader("puntuaciones.txt"));
-			String puntos = fr.readLine();
-			while (puntos != null) {
-				puntuaciones.add(puntos);
-				puntos = fr.readLine();
-			}
-			fr.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			puntuaciones.addAll(cargarFichero());
+		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		}
+		} 
+	}
+	
+	private List<String> cargarFichero() throws URISyntaxException, IOException {
+		Path scoreFile = Paths.get("puntos.txt");
+		List<String> score = Files.readAllLines(scoreFile, StandardCharsets.UTF_8);
+		return score;
 	}
 	
 	public BorderPane getView() {

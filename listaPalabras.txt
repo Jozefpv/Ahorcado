@@ -1,6 +1,6 @@
-teclado
-monitor
-raton
-cable
-david
-samuel
+azucar
+espacio
+pelo
+logotipo
+as
+boton

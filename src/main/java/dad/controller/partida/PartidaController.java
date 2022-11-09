@@ -1,46 +1,57 @@
 package dad.controller.partida;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 
 import dad.ahorcado.AhorcadoApp;
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
+
 public class PartidaController implements Initializable {
 	//
-	ArrayList<String> datos = new ArrayList<>();
 	ArrayList<String> puntuaciones = new ArrayList<>();
-
 	String palabraOculta = "", palabraResolver = "";
 	BufferedReader fr;
 	Random rd = new Random();
-	int cont, puntuacion = 0;
+	int cont, puntuacion = 0, puntuacionPalabra;
 	int numRandom;
 
 	// model
 	private StringProperty palabra = new SimpleStringProperty();
 	private StringProperty letra = new SimpleStringProperty();
+	private ListProperty<String> datos = new SimpleListProperty<>(FXCollections.observableArrayList());
+	private ListProperty<String> letrasUtilizadas = new SimpleListProperty<>(FXCollections.observableArrayList());
 
 	public final StringProperty palabraProperty() {
 		return this.palabra;
@@ -64,6 +75,18 @@ public class PartidaController implements Initializable {
 
 	public final void setLetra(final String letra) {
 		this.letraProperty().set(letra);
+	}
+
+	public final ListProperty<String> datosProperty() {
+		return this.datos;
+	}
+
+	public final ObservableList<String> getDatos() {
+		return this.datosProperty().get();
+	}
+
+	public final void setDatos(final ObservableList<String> datos) {
+		this.datosProperty().set(datos);
 	}
 
 	// view
@@ -97,32 +120,29 @@ public class PartidaController implements Initializable {
 
 		// load word
 		try {
-			fr = new BufferedReader(new FileReader("listaPalabras.txt"));
-			String words = fr.readLine();
-			while (words != null) {
-				datos.add(words);
-				words = fr.readLine();
-			}
-		} catch (IOException e) {
+			datos.addAll(cargarFichero("listaPalabras.txt"));
+		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		}
+		} 
 		loadWord();
 
 		try {
-			BufferedReader fr = new BufferedReader(new FileReader("puntuaciones.txt"));
-			String puntos = fr.readLine();
-			while (puntos != null) {
-				puntuaciones.add(puntos);
-				puntos = fr.readLine();
-			}
-			fr.close();
-		} catch (IOException e) {
+			puntuaciones.addAll(cargarFichero("puntos.txt"));
+		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		}
+		} 
+	}
+	
+	private List<String> cargarFichero(String ruta) throws URISyntaxException, IOException {
+		Path dataFile = Paths.get(ruta);
+		List<String> data = Files.readAllLines(dataFile, StandardCharsets.UTF_8);
+		return data;
 	}
 
 	private void loadWord() {
 		cont = 0;
+		puntuacionPalabra = 0;
+		letrasUtilizadas.clear();
 		setImage();
 		letrasUtilizadasLabel.setText("");
 		palabraOculta = "";
@@ -151,7 +171,7 @@ public class PartidaController implements Initializable {
 		alert.setHeaderText("Has perdido");
 		alert.setContentText("La respuesta correcta era: " + palabra.get() + " - Pts: " + puntuacion);
 		alert.showAndWait();
-		
+
 		try {
 			setPuntuacion();
 			AhorcadoApp.primaryStage.close();
@@ -170,9 +190,8 @@ public class PartidaController implements Initializable {
 		if (name.isPresent() && !name.get().isBlank()) {
 			puntuaciones.add(name.get().trim().toUpperCase() + " - " + puntuacion);
 		}
-		
-		
-		FileWriter salida = new FileWriter("puntuaciones.txt");
+
+		FileWriter salida = new FileWriter("puntos.txt");
 		for (int i = 0; i < puntuaciones.size(); i++) {
 			salida.append(puntuaciones.get(i));
 			salida.append("\n");
@@ -181,36 +200,63 @@ public class PartidaController implements Initializable {
 		salida.close();
 	}
 
+	private String toStringLetrasUtilizadas() {
+		String letras = "";
+		for (int i = 0; i < letrasUtilizadas.size(); i++) {
+			letras += letrasUtilizadas.get(i).toString().toUpperCase() + " ";
+		}
+		return letras;
+	}
+
+	private boolean existeLetra(String letra) {
+		boolean value = false;
+		if (letrasUtilizadas.contains(letra)) {
+			value = true;
+		}
+		return value;
+	}
+
 	@FXML
 	void onLetraAction(ActionEvent event) {
 		if (!letraText.getText().isEmpty()) {
 			setLetra((letraText.getText().charAt(0) + "").toUpperCase());
-			letrasUtilizadasLabel.setText(letrasUtilizadasLabel.getText() + " " + getLetra());
-			boolean check = false;
-			for (int i = 0; i < palabra.get().length(); i++) {
-				if (palabra.get().charAt(i) == getLetra().charAt(0)) {
-					palabraResolver += getLetra().charAt(0);
-					puntuacion++;
-					check = true;
-				} else if (palabraOculta.charAt(i) != '_') {
-					palabraResolver += palabraOculta.charAt(i);
-				} else {
-					palabraResolver += "_";
+			if (!existeLetra(getLetra().toUpperCase())) {
+				letrasUtilizadas.add(getLetra());
+				letrasUtilizadasLabel.setText(toStringLetrasUtilizadas());
+				boolean check = false;
+				for (int i = 0; i < palabra.get().length(); i++) {
+					if (palabra.get().charAt(i) == getLetra().charAt(0)) {
+						palabraResolver += getLetra().charAt(0);
+						puntuacion++;
+						puntuacionPalabra++;
+						check = true;
+					} else if (palabraOculta.charAt(i) != '_') {
+						palabraResolver += palabraOculta.charAt(i);
+					} else {
+						palabraResolver += "_";
+					}
+
 				}
+				if (!check) {
+					setImage();
+				}
+				palabraOculta = palabraResolver;
+				palabraLabel.setText(palabraOculta);
+				palabraResolver = "";
+				letraText.setText("");
+				puntosLabel.setText(puntuacion + "");
 
+				if (palabraOculta.equals(palabra.get())) {
+					loadWord();
+				}
+			}else {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Letra repetida");
+				alert.setHeaderText("Ya has puesto esta letra");
+				alert.showAndWait();
+				letraText.setText("");
 			}
-			if (!check) {
-				setImage();
-			}
-			palabraOculta = palabraResolver;
-			palabraLabel.setText(palabraOculta);
-			palabraResolver = "";
-			letraText.setText("");
-			puntosLabel.setText(puntuacion + "");
-
-			if (palabraOculta.equals(palabra.get())) {
-				loadWord();
-			}
+			
 		}
 
 	}
@@ -218,7 +264,7 @@ public class PartidaController implements Initializable {
 	@FXML
 	void onResolverAction(ActionEvent event) {
 		if (letraText.getText().toUpperCase().equals(palabra.get())) {
-			puntuacion += palabra.get().length();
+			puntuacion = puntuacion + (palabra.get().length() - puntuacionPalabra);
 			puntosLabel.setText(puntuacion + "");
 			loadWord();
 			letraText.setText("");

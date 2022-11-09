@@ -1,10 +1,15 @@
 package dad.controller.palabras;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -87,18 +92,18 @@ public class PalabrasController implements Initializable {
 
 		// load data
 		try {
-			BufferedReader fr = new BufferedReader(new FileReader("listaPalabras.txt"));
-			String words = fr.readLine();
-			while (words != null) {
-				palabras.add(words);
-				words = fr.readLine();
-			}
-			fr.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			palabras.addAll(cargarFichero());
+		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		}
+		} 
+		
 
+	}
+	
+	public List<String> cargarFichero() throws URISyntaxException, IOException {
+		Path wordsFile = Paths.get("listaPalabras.txt");
+		List<String> words = Files.readAllLines(wordsFile, StandardCharsets.UTF_8);
+		return words;
 	}
 
 	@FXML
