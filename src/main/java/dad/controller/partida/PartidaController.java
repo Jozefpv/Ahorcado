@@ -1,7 +1,6 @@
 package dad.controller.partida;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,14 +36,13 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
-
 public class PartidaController implements Initializable {
 	//
 	ArrayList<String> puntuaciones = new ArrayList<>();
 	String palabraOculta = "", palabraResolver = "";
 	BufferedReader fr;
 	Random rd = new Random();
-	int cont, puntuacion = 0, puntuacionPalabra;
+	int cont = 1, puntuacion = 0, puntuacionPalabra;
 	int numRandom;
 
 	// model
@@ -117,22 +115,22 @@ public class PartidaController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-
+		
 		// load word
 		try {
 			datos.addAll(cargarFichero("listaPalabras.txt"));
 		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		} 
+		}
 		loadWord();
 
 		try {
 			puntuaciones.addAll(cargarFichero("puntos.txt"));
 		} catch (URISyntaxException | IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	private List<String> cargarFichero(String ruta) throws URISyntaxException, IOException {
 		Path dataFile = Paths.get(ruta);
 		List<String> data = Files.readAllLines(dataFile, StandardCharsets.UTF_8);
@@ -140,10 +138,10 @@ public class PartidaController implements Initializable {
 	}
 
 	private void loadWord() {
-		cont = 0;
+		//cont = 0;
 		puntuacionPalabra = 0;
 		letrasUtilizadas.clear();
-		setImage();
+		//setImage();
 		letrasUtilizadasLabel.setText("");
 		palabraOculta = "";
 		numRandom = rd.nextInt(datos.size());
@@ -151,15 +149,16 @@ public class PartidaController implements Initializable {
 		for (int i = 0; i < getPalabra().length(); i++) {
 			palabraOculta += "_";
 		}
-		System.out.println(palabra.get());
+		// System.out.println(palabra.get());
 		palabraLabel.setText(palabraOculta);
 	}
 
 	private void setImage() {
 		cont++;
-		if (cont < 10) {
+		if (cont < 9) {
 			imageContent.setImage(new Image(String.format("/images/%d.png", cont)));
 		} else {
+			imageContent.setImage(new Image(String.format("/images/%d.png", cont)));
 			partidaFinalizada();
 		}
 
@@ -249,14 +248,14 @@ public class PartidaController implements Initializable {
 				if (palabraOculta.equals(palabra.get())) {
 					loadWord();
 				}
-			}else {
+			} else {
 				Alert alert = new Alert(AlertType.INFORMATION);
 				alert.setTitle("Letra repetida");
 				alert.setHeaderText("Ya has puesto esta letra");
 				alert.showAndWait();
 				letraText.setText("");
 			}
-			
+
 		}
 
 	}

@@ -110,9 +110,9 @@ public class PalabrasController implements Initializable {
 	void onNuevoAction(ActionEvent event) throws IOException {
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.initOwner(AhorcadoApp.primaryStage);
-		dialog.setTitle("Nuevo nombre");
-		dialog.setHeaderText("Añadir un nuevo nombre a la lista");
-		dialog.setContentText("Nombre: ");
+		dialog.setTitle("Nuevo palabra");
+		dialog.setHeaderText("Añadir una nueva palabra a la lista");
+		dialog.setContentText("Palabra: ");
 		Optional<String> name = dialog.showAndWait();
 		if (name.isPresent() && !name.get().isBlank() && !palabras.contains(name.get())) {
 			palabras.add(name.get().trim());

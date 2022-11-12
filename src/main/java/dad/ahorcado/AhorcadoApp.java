@@ -2,6 +2,7 @@ package dad.ahorcado;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class AhorcadoApp extends Application {
@@ -14,7 +15,9 @@ public class AhorcadoApp extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// TODO Auto-generated method stub
 		AhorcadoApp.primaryStage = primaryStage;
+		
 		primaryStage.setTitle("Ahorcado");
+		primaryStage.getIcons().add(new Image("/images/9.png"));
 		primaryStage.setScene(new Scene(rootController.getView()));
 		primaryStage.show();
 	}
