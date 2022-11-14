@@ -14,24 +14,31 @@ public class Prueba {
 	public static void main(String[] args) throws Exception {
 
 		Prueba p = new Prueba();
-		System.out.println(p.cargarFichero().toString());
-		// p.cargar();
+		//System.out.println(p.cargarFichero().toString());
+		p.cargar();
+		
 	}
 
 	public List<Puntos> cargarFichero() throws URISyntaxException, IOException {
 
 		Path scoreFile = Paths.get("puntos.txt");
 		List<String> score = Files.readAllLines(scoreFile, StandardCharsets.UTF_8);
-		return score.stream().map(line -> line.split(" - ")).map(parts -> {
-			String nombre = parts[0];
-			int puntos = Integer.parseInt(parts[1].trim());
-			return new Puntos(nombre, puntos);
-		}).collect(Collectors.toList());
+		System.out.println(score);
+		return score.stream()
+				.map(line -> line.split(" - "))
+				.map(parts -> {
+					String nombre = parts[0];
+					int puntos = Integer.parseInt(parts[1].trim());
+					return new Puntos(nombre, puntos);
+				}).collect(Collectors.toList());
 
 	}
 
 	public void cargar() throws IOException, URISyntaxException {
-		Path scoreFile = Paths.get(getClass().getResource("/datos/prueba.txt").toURI());
+		//Esto funciona cuando esta dentro de la carpeta resources
+	//	Path scoreFile = Paths.get(getClass().getResource("/datos/prueba.txt").toURI());
+		Path scoreFile = Paths.get("puntos.txt");
+
 		List<String> score = Files.readAllLines(scoreFile, StandardCharsets.UTF_8);
 		System.out.println(score);
 	}
