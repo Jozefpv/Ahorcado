@@ -1,6 +1,5 @@
 package dad.controller.partida;
 
-import java.io.BufferedReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -37,55 +36,17 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 
 public class PartidaController implements Initializable {
+	
 	//
 	ArrayList<String> puntuaciones = new ArrayList<>();
 	String palabraOculta = "", palabraResolver = "";
-	BufferedReader fr;
-	Random rd = new Random();
-	int cont = 1, puntuacion = 0, puntuacionPalabra;
-	int numRandom;
+	int fallos = 1, puntuacion = 0, puntuacionPalabra;
 
 	// model
 	private StringProperty palabra = new SimpleStringProperty();
 	private StringProperty letra = new SimpleStringProperty();
-	private ListProperty<String> datos = new SimpleListProperty<>(FXCollections.observableArrayList());
+	private ListProperty<String> palabras = new SimpleListProperty<>(FXCollections.observableArrayList());
 	private ListProperty<String> letrasUtilizadas = new SimpleListProperty<>(FXCollections.observableArrayList());
-
-	public final StringProperty palabraProperty() {
-		return this.palabra;
-	}
-
-	public final String getPalabra() {
-		return this.palabraProperty().get();
-	}
-
-	public final void setPalabra(final String palabra) {
-		this.palabraProperty().set(palabra);
-	}
-
-	public final StringProperty letraProperty() {
-		return this.letra;
-	}
-
-	public final String getLetra() {
-		return this.letraProperty().get();
-	}
-
-	public final void setLetra(final String letra) {
-		this.letraProperty().set(letra);
-	}
-
-	public final ListProperty<String> datosProperty() {
-		return this.datos;
-	}
-
-	public final ObservableList<String> getDatos() {
-		return this.datosProperty().get();
-	}
-
-	public final void setDatos(final ObservableList<String> datos) {
-		this.datosProperty().set(datos);
-	}
 
 	// view
 	@FXML
@@ -116,12 +77,6 @@ public class PartidaController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		
-		// load word
-		try {
-			datos.addAll(cargarFichero("listaPalabras.txt"));
-		} catch (URISyntaxException | IOException e) {
-			e.printStackTrace();
-		}
 		loadWord();
 
 		try {
@@ -144,8 +99,8 @@ public class PartidaController implements Initializable {
 		//setImage();
 		letrasUtilizadasLabel.setText("");
 		palabraOculta = "";
-		numRandom = rd.nextInt(datos.size());
-		setPalabra(datos.get(numRandom).toUpperCase());
+		int numRandom = new Random().nextInt(palabras.size());
+		setPalabra(palabras.get(numRandom).toUpperCase());
 		for (int i = 0; i < getPalabra().length(); i++) {
 			palabraOculta += "_";
 		}
@@ -153,15 +108,12 @@ public class PartidaController implements Initializable {
 		palabraLabel.setText(palabraOculta);
 	}
 
-	private void setImage() {
-		cont++;
-		if (cont < 9) {
-			imageContent.setImage(new Image(String.format("/images/%d.png", cont)));
-		} else {
-			imageContent.setImage(new Image(String.format("/images/%d.png", cont)));
+	private void fallo() {
+		fallos++;
+		imageContent.setImage(new Image(String.format("/images/%d.png", fallos)));
+		if (fallos == 9) {
 			partidaFinalizada();
 		}
-
 	}
 
 	private void partidaFinalizada() {
@@ -173,6 +125,7 @@ public class PartidaController implements Initializable {
 
 		try {
 			setPuntuacion();
+			// FIXME quitar esto y reiniciar la partida
 			AhorcadoApp.primaryStage.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -237,7 +190,7 @@ public class PartidaController implements Initializable {
 
 				}
 				if (!check) {
-					setImage();
+					fallo();
 				}
 				palabraOculta = palabraResolver;
 				palabraLabel.setText(palabraOculta);
@@ -275,5 +228,65 @@ public class PartidaController implements Initializable {
 	public BorderPane getView() {
 		return view;
 	}
+
+	public final ListProperty<String> palabrasProperty() {
+		return this.palabras;
+	}
+	
+
+	public final ObservableList<String> getPalabras() {
+		return this.palabrasProperty().get();
+	}
+	
+
+	public final void setPalabras(final ObservableList<String> palabras) {
+		this.palabrasProperty().set(palabras);
+	}
+
+	public final StringProperty palabraProperty() {
+		return this.palabra;
+	}
+	
+
+	public final String getPalabra() {
+		return this.palabraProperty().get();
+	}
+	
+
+	public final void setPalabra(final String palabra) {
+		this.palabraProperty().set(palabra);
+	}
+
+	public final StringProperty letraProperty() {
+		return this.letra;
+	}
+	
+
+	public final String getLetra() {
+		return this.letraProperty().get();
+	}
+	
+
+	public final void setLetra(final String letra) {
+		this.letraProperty().set(letra);
+	}
+	
+
+	public final ListProperty<String> letrasUtilizadasProperty() {
+		return this.letrasUtilizadas;
+	}
+	
+
+	public final ObservableList<String> getLetrasUtilizadas() {
+		return this.letrasUtilizadasProperty().get();
+	}
+	
+
+	public final void setLetrasUtilizadas(final ObservableList<String> letrasUtilizadas) {
+		this.letrasUtilizadasProperty().set(letrasUtilizadas);
+	}
+	
+	
+	
 
 }

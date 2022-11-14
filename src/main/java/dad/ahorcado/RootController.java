@@ -7,10 +7,6 @@ import java.util.ResourceBundle;
 import dad.controller.palabras.PalabrasController;
 import dad.controller.partida.PartidaController;
 import dad.controller.puntuacion.PuntuacionController;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,25 +16,11 @@ import javafx.scene.control.TabPane;
 public class RootController implements Initializable {
 
 	// controllers
+	
 	private PalabrasController palabrasController = new PalabrasController();
 	private PartidaController partidaController = new PartidaController();
 	private PuntuacionController puntuacionController = new PuntuacionController();
 
-
-	public final ListProperty<String> palabrasProperty() {
-		return this.palabras;
-	}
-
-	public final ObservableList<String> getPalabras() {
-		return this.palabrasProperty().get();
-	}
-
-	public final void setPalabras(final ObservableList<String> palabras) {
-		this.palabrasProperty().set(palabras);
-	}
-	// model
-
-	private ListProperty<String> palabras = new SimpleListProperty<>(FXCollections.observableArrayList());
 
 	// view
 	@FXML
@@ -70,13 +52,14 @@ public class RootController implements Initializable {
 		palabrasTab.setContent(palabrasController.getView());
 		puntuacionesTab.setContent(puntuacionController.getView());
 
-
 		// bindings
+		
+		partidaController.palabrasProperty().bind(palabrasController.palabrasProperty());
 
 	}
 
 	public TabPane getView() {
 		return view;
 	}
-
+	
 }

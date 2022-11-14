@@ -35,30 +35,6 @@ public class PalabrasController implements Initializable {
 	private ListProperty<String> palabras = new SimpleListProperty<>(FXCollections.observableArrayList());
 	private StringProperty palabraSeleccionada = new SimpleStringProperty();
 
-	public final ListProperty<String> palabrasProperty() {
-		return this.palabras;
-	}
-
-	public final ObservableList<String> getPalabras() {
-		return this.palabrasProperty().get();
-	}
-
-	public final void setPalabras(final ObservableList<String> palabras) {
-		this.palabrasProperty().set(palabras);
-	}
-
-	public final StringProperty palabraSeleccionadaProperty() {
-		return this.palabraSeleccionada;
-	}
-
-	public final String getPalabraSeleccionada() {
-		return this.palabraSeleccionadaProperty().get();
-	}
-
-	public final void setPalabraSeleccionada(final String palabraSeleccionada) {
-		this.palabraSeleccionadaProperty().set(palabraSeleccionada);
-	}
-
 	// view
 	@FXML
 	private Button nuevoButton;
@@ -113,34 +89,27 @@ public class PalabrasController implements Initializable {
 		dialog.setTitle("Nuevo palabra");
 		dialog.setHeaderText("Añadir una nueva palabra a la lista");
 		dialog.setContentText("Palabra: ");
-		Optional<String> name = dialog.showAndWait();
-		if (name.isPresent() && !name.get().isBlank() && !palabras.contains(name.get())) {
-			palabras.add(name.get().trim());
+		Optional<String> word = dialog.showAndWait();
+		if (word.isPresent() && !word.get().isBlank() && !palabras.contains(word.get())) {
+			palabras.add(word.get().trim());
+			guardarPalabras();			
 		}
 
-		FileWriter salida = new FileWriter("listaPalabras.txt");
-
-		for (int i = 0; i < palabras.getSize(); i++) {
-			salida.append(palabras.get(i));
-			salida.append("\n");
-		}
-
-		salida.close();
 	}
 
 	@FXML
 	void onQuitarAction(ActionEvent event) throws IOException {
 		System.out.println(palabraSeleccionadaProperty().get());
-
 		palabras.remove(palabras.indexOf(palabraSeleccionadaProperty().get()));
+		guardarPalabras();
+	}
 
+	private void guardarPalabras() throws IOException {
 		FileWriter salida = new FileWriter("listaPalabras.txt");
-
 		for (int i = 0; i < palabras.getSize(); i++) {
 			salida.append(palabras.get(i));
 			salida.append("\n");
 		}
-
 		salida.close();
 	}
 
@@ -148,4 +117,28 @@ public class PalabrasController implements Initializable {
 		return view;
 	}
 
+	public final ListProperty<String> palabrasProperty() {
+		return this.palabras;
+	}
+
+	public final ObservableList<String> getPalabras() {
+		return this.palabrasProperty().get();
+	}
+
+	public final void setPalabras(final ObservableList<String> palabras) {
+		this.palabrasProperty().set(palabras);
+	}
+
+	public final StringProperty palabraSeleccionadaProperty() {
+		return this.palabraSeleccionada;
+	}
+
+	public final String getPalabraSeleccionada() {
+		return this.palabraSeleccionadaProperty().get();
+	}
+
+	public final void setPalabraSeleccionada(final String palabraSeleccionada) {
+		this.palabraSeleccionadaProperty().set(palabraSeleccionada);
+	}
+	
 }

@@ -58,7 +58,6 @@ public class PuntuacionController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
 
 		// bindings
 		listaPuntuaciones.itemsProperty().bind(puntuaciones);
